@@ -1,0 +1,1 @@
+![Logo](/ba-logo.svg)
