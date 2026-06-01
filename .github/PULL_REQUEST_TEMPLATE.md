@@ -12,10 +12,12 @@
 
 - [ ] Added or updated documentation
 - [ ] Added tests for new functionality and regression tests for bug fixes
-- [ ] The commits follow our [conventional commits and release guidelines](https://github.com/ba-itsys/.github/blob/main/docs/release-process.md)
+- [ ] The commits follow our [conventional commit and release guidelines](https://github.com/ba-itsys/.github/blob/main/docs/release-process.md)
 - [ ] The code is properly formated (eg. `mvn spotless:apply`)
 - [ ] You agree to the [Developer Certificate of Origin (DCO)](https://developercertificate.org/) and thereby all your commits have a `Signed-off-by` line in the message
 
 
-<!-- Questions? Have a look at the CONTRIBUTING.md at https://github.com/ba-itsys/.github/blob/main/CONTRIBUTING.md
+<!-- Questions? Have a look at
+     https://github.com/ba-itsys/.github/blob/main/CONTRIBUTING.md
+
      Thanks for contributing! -->
