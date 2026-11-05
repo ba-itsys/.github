@@ -65,9 +65,11 @@ Our goal is to be helpful and professional. Follow these steps when reviewing PR
 
 ### Merging
 
-To keep our project history clean and easy to follow, we maintain a strictly linear git history. **The default "Merge
-commit" option is disabled in the GitHub settings for all repositories** to avoid non-linear "merge bubbles" that can
-make the history difficult to navigate.
+To keep our project history clean and easy to follow, we maintain a strictly linear git history. Merge rules
+are managed as [repository rulesets](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-settings-for-your-repository/about-repository-rulesets)
+(see [Infrastructure as Code](#infrastructure-as-code)): the default "Merge
+commit" option is disabled to avoid non-linear "merge bubbles" that can make
+the history difficult to navigate.
 
 1. **Rebase (Preferred):** Our standard approach is to use **Rebase and Merge**. We encourage contributors to use
    interactive rebasing to keep their branch up-to-date with `main` and to organize their commits into a clean, logical
@@ -99,18 +101,49 @@ We use [release-please](https://github.com/googleapis/release-please) to automat
 Dependabot is enabled on all repositories to keep dependencies secure and up-to-date.
 
 - **Minor/Patch:** Usually safe to merge if CI passes.
-- **Major:** Exercise caution, merge only if the CI passes. 
+- **Major:** Exercise caution, merge only if the CI passes.
 - **Conflicts:** Use `@dependabot rebase` if the lockfile becomes out of sync.
 - **Priority:** Ensure Dependabot PRs are merged before the final Release PR to include them in the next release.
+
+### Dependabot Auto-Merge
+
+To keep this process fast and low-maintenance, we [automate Dependabot with
+GitHub
+Actions](https://docs.github.com/en/enterprise-cloud@latest/code-security/tutorials/secure-your-dependencies/automate-dependabot-with-actions):
+eligible updates are approved and scheduled for **auto-merge (rebase)**
+automatically.
+
+- **Conditions:** Only **patch and minor** updates are auto-merged. **Major**
+  updates always require manual oversight.
+- **Merge gate:** Auto-merge only happens if CI succeeds. This is enforced by a
+  ruleset that requires an aggregate status check named `automerge-check`,
+  which is provided by a small, generalized job in each repository's CI
+  workflow. This keeps the merge checks defined in Terraform fully generic,
+  loosely coupled from the individual CI jobs, and consistent across all
+  repositories.
+- **Ruleset:** Created and managed automatically via Terraform for every
+  public repository (public repositories only, as this is a paid feature).
+- **CI side:** Every repository includes an `automerge-check` job in its CI
+  workflow whose `needs` list references all jobs that must pass before a
+  merge is allowed.
+
+See the [Dependabot Auto-Merge & the `automerge-check` Job](dependabot/automerge-check.md)
+document for details, code examples, and a guide for new repositories.
 
 ## Infrastructure as Code
 
 ### Terraform Management
 
-We use Terraform to manage repository configurations, e.g.:
+We use Terraform to manage repository configurations in the
+[github-provisioning](https://github.com/ba-itsys/github-provisioning) repository, e.g.:
 
 - Repository creation.
-- Branch protection rules.
+- Repository [rulesets](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-settings-for-your-repository/about-repository-rulesets):
+  - Prevent deletion of the default branch and force pushes.
+  - Enforce a linear history on the default branch.
+  - Required status checks (`automerge-check`, `commitlint`, `DCO`) to gate
+    merges — see [Dependabot Auto-Merge](#dependabot-auto-merge).
+  - Pull request requirements (approvals, merge methods, ...).
 
-If you need to create a new repository or change organization-level settings, please submit a PR to the terraform
-repository.
+If you need to create a new repository or change organization-level settings, please submit a PR to the
+github-provisioning repository.
